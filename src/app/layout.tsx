@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SwipeBackHandler } from "@/components/SwipeBackHandler";
@@ -15,15 +15,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Bouldering Topo",
-  description: "Climbing topo app",
+  title: "Bouldering Topo App",
+  description: "Manage your climbing areas and boulders",
+  manifest: "/manifest.json",
 };
 
-export const viewport = {
-  width: 'device-width',
+export const viewport: Viewport = {
+  width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  themeColor: "#000000",
   viewportFit: 'cover',
 };
 
