@@ -41,7 +41,8 @@ export function useArea(id: string | null | undefined) {
                 .from('boulders')
                 .select('*, problems(*)')
                 .eq('area_id', id)
-                .order('name');
+                .order('name')
+                .order('created_at', { foreignTable: 'problems', ascending: true });
 
             if (bouldersError) throw bouldersError;
 
@@ -62,6 +63,7 @@ export function useBoulder(id: string | null | undefined) {
                 .from('boulders')
                 .select('*, area_id, problems(*)')
                 .eq('id', id)
+                .order('created_at', { foreignTable: 'problems', ascending: true })
                 .single();
 
             if (error) throw error;
