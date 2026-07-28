@@ -110,7 +110,7 @@ function BoulderForm() {
             await queryClient.invalidateQueries({ queryKey: ['area', areaId] });
             await queryClient.invalidateQueries({ queryKey: ['areas'] });
 
-            router.push(`/area/${areaId}`);
+            router.push(`/area?id=${areaId}`);
             router.refresh();
         } catch (error: any) {
             console.error("Error creating boulder:", error);
