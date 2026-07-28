@@ -18,6 +18,14 @@ export const metadata: Metadata = {
   title: "Bouldering Topo App",
   description: "Manage your climbing areas and boulders",
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Topo",
+  },
+  icons: {
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {

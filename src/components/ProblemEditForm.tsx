@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -17,12 +17,18 @@ function ProblemEditForm() {
     const [description, setDescription] = useState("");
     const [boulderId, setBoulderId] = useState<string | null>(null);
     const router = useRouter();
-    const params = useParams();
-    const id = params.id as string;
+    const searchParams = useSearchParams();
+    const id = searchParams.get("id");
     const queryClient = useQueryClient();
 
     useEffect(() => {
         const init = async () => {
+            if (!id) {
+                alert("Problem not found");
+                router.back();
+                return;
+            }
+
             // 1. Check Auth
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {

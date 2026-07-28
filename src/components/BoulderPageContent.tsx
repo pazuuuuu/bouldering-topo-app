@@ -247,7 +247,7 @@ function BoulderPageContentInner() {
                                     </div>
                                     {user && (
                                         <div className="flex items-center">
-                                            <Link href={`/problem/${problem.id}/edit`}>
+                                            <Link href={`/problem/edit?id=${problem.id}`}>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
