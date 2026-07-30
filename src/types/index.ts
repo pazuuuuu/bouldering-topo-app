@@ -9,7 +9,8 @@ export interface Problem {
 export interface Boulder {
   id: string;
   name: string;
-  imageUrl: string;
+  imageUrl?: string; // Legacy single cover image (kept in sync with imageUrls[0])
+  imageUrls?: string[]; // Multiple images per boulder
   problems: Problem[];
   coordinates?: { lat: number; lng: number };
 }

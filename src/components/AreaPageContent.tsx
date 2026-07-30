@@ -25,6 +25,7 @@ interface Boulder {
     id: string;
     name: string;
     image_url: string;
+    image_urls?: string[];
     problems: { id: string; grade: string }[];
 }
 
@@ -247,21 +248,32 @@ export default function AreaPageContent() {
 
                 <div className="grid gap-4">
                     <h2 className="text-xl font-semibold">Boulders</h2>
-                    {boulders?.map((boulder: any) => (
+                    {boulders?.map((boulder: any) => {
+                        const coverImage =
+                            boulder.image_urls?.[0] ||
+                            boulder.image_url ||
+                            "https://placehold.co/600x400/png?text=No+Image";
+                        const imageCount = boulder.image_urls?.length ?? (boulder.image_url ? 1 : 0);
+                        return (
                         <Link key={boulder.id} href={`/boulder?id=${boulder.id}`}>
                             <Card className="hover:bg-muted/50 transition-colors cursor-pointer overflow-hidden">
                                 <div className="aspect-video w-full relative bg-muted">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
-                                        src={boulder.image_url || "https://placehold.co/600x400/png?text=No+Image"}
+                                        src={coverImage}
                                         alt={boulder.name}
                                         className="object-cover w-full h-full"
                                         onClick={(e) => {
                                             e.preventDefault(); // Prevent navigation
                                             e.stopPropagation();
-                                            setSelectedImage(boulder.image_url || "https://placehold.co/600x400/png?text=No+Image");
+                                            setSelectedImage(coverImage);
                                         }}
                                     />
+                                    {imageCount > 1 && (
+                                        <span className="absolute bottom-2 right-2 text-xs bg-black/60 text-white px-2 py-0.5 rounded-md">
+                                            {imageCount} photos
+                                        </span>
+                                    )}
                                 </div>
                                 <CardHeader>
                                     <CardTitle className="flex items-center justify-between">
@@ -286,7 +298,8 @@ export default function AreaPageContent() {
                                 </CardContent>
                             </Card>
                         </Link>
-                    ))}
+                        );
+                    })}
                     {boulders?.length === 0 && (
                         <p className="text-muted-foreground">No boulders found in this area.</p>
                     )}
