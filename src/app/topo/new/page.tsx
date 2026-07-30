@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 function BoulderForm() {
@@ -14,7 +14,7 @@ function BoulderForm() {
     const [submitting, setSubmitting] = useState(false);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imageFiles, setImageFiles] = useState<File[]>([]);
     const [problemName, setProblemName] = useState("");
     const [problemGrade, setProblemGrade] = useState("");
     const [problemDescription, setProblemDescription] = useState("");
@@ -36,9 +36,15 @@ function BoulderForm() {
     }, [router]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setImageFile(e.target.files[0]);
+        if (e.target.files && e.target.files.length > 0) {
+            setImageFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
+            // Reset the input so selecting the same file again still fires onChange
+            e.target.value = "";
         }
+    };
+
+    const handleRemoveImage = (index: number) => {
+        setImageFiles((prev) => prev.filter((_, i) => i !== index));
     };
 
     const uploadImage = async (file: File): Promise<string> => {
@@ -70,9 +76,9 @@ function BoulderForm() {
 
         setSubmitting(true);
         try {
-            let imageUrl = "";
-            if (imageFile) {
-                imageUrl = await uploadImage(imageFile);
+            const imageUrls: string[] = [];
+            for (const file of imageFiles) {
+                imageUrls.push(await uploadImage(file));
             }
 
             // 1. Create Boulder
@@ -82,7 +88,9 @@ function BoulderForm() {
                     area_id: areaId,
                     name,
                     description,
-                    image_url: imageUrl
+                    image_urls: imageUrls,
+                    // Keep the legacy single column in sync with the cover image
+                    image_url: imageUrls[0] ?? null
                 })
                 .select()
                 .single();
@@ -141,16 +149,43 @@ function BoulderForm() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* 1. Image Selection */}
                     <div>
-                        <label className="block text-sm font-medium mb-1">Boulder Image</label>
+                        <label className="block text-sm font-medium mb-1">Boulder Images</label>
                         <Input
                             type="file"
                             accept="image/*"
+                            multiple
                             onChange={handleImageChange}
                             className="cursor-pointer"
                         />
                         <p className="text-xs text-muted-foreground mt-1">
-                            Select an image from your device.
+                            Select one or more images from your device. You can add more after creating too.
                         </p>
+
+                        {imageFiles.length > 0 && (
+                            <div className="grid grid-cols-3 gap-2 mt-3">
+                                {imageFiles.map((file, index) => (
+                                    <div
+                                        key={`${file.name}-${index}`}
+                                        className="relative rounded-md overflow-hidden border bg-muted aspect-video"
+                                    >
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={URL.createObjectURL(file)}
+                                            alt={`Selected ${index + 1}`}
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveImage(index)}
+                                            className="absolute top-1 right-1 h-6 w-6 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-md"
+                                            aria-label="Remove image"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* 2. Boulder Name */}
