@@ -37,7 +37,11 @@ function BoulderForm() {
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
-            setImageFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
+            // Capture the files synchronously: the setImageFiles updater runs
+            // asynchronously, but the line below clears e.target.files right away,
+            // so reading e.target.files inside the updater would see an empty list.
+            const newFiles = Array.from(e.target.files);
+            setImageFiles((prev) => [...prev, ...newFiles]);
             // Reset the input so selecting the same file again still fires onChange
             e.target.value = "";
         }
